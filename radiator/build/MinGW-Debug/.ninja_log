@@ -1,0 +1,9 @@
+# ninja log v6
+79	553	7848552164518666	radiator_autogen/timestamp	201a79af19c2700d
+79	553	7848552164518666	F:/Dev/projects/cpp-radiator/radiator/build/MinGW-Debug/radiator_autogen/timestamp	201a79af19c2700d
+1553	5965	7847581300033342	CMakeFiles/radiator.dir/radiator_autogen/mocs_compilation.cpp.obj	5ad53d25d28f287c
+79	553	7848552164518666	radiator_autogen/mocs_compilation.cpp	201a79af19c2700d
+79	553	7848552164518666	F:/Dev/projects/cpp-radiator/radiator/build/MinGW-Debug/radiator_autogen/mocs_compilation.cpp	201a79af19c2700d
+1572	6116	7847581300191539	CMakeFiles/radiator.dir/main.cpp.obj	dc56961a0c98d721
+555	5155	7848552169268677	CMakeFiles/radiator.dir/mainwindow.cpp.obj	2fe167e98cf2eef6
+5156	6012	7848552215278673	radiator.exe	f16a530769586876
