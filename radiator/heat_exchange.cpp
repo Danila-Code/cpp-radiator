@@ -1,6 +1,7 @@
 #include "heat_exchange.h"
 
 #include <algorithm>
+#include <array>
 
 namespace {
 FlowMode GetFlowMode(double value) {
@@ -32,9 +33,9 @@ double AlfaKonv(double tw, double tf, double size) {
     const std::array<double, 4> Coef = {0.5, 1.18, 0.54, 0.135};
     const std::array<double, 4> CoefDegree = {0, 0.125, 0.25, 0.33};
 
-    td = (tw + tf) / 2;  // defining temperature
+    double td = (tw + tf) / 2;  // defining temperature
     double value = Gr(size, tw, tf, td) * Pr(td);
-    int mode = GetFlowMode(value);
+    int mode = static_cast<int>(GetFlowMode(value));
 
     return Coef[mode] * std::pow(value, CoefDegree[mode])
                       * Conductivity(td) / size;

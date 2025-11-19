@@ -14,29 +14,172 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>781</width>
-      <height>411</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Tab 1</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Tab 2</string>
-     </attribute>
-    </widget>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="1">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="baseSize">
+       <size>
+        <width>407</width>
+        <height>284</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tb_radiator_params">
+       <attribute name="title">
+        <string>Параметры радиатора</string>
+       </attribute>
+       <widget class="QFrame" name="fr_base_sizes">
+        <property name="geometry">
+         <rect>
+          <x>510</x>
+          <y>20</y>
+          <width>218</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lbl_base_length">
+           <property name="text">
+            <string>Длина, мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="le_base_length"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lbl_base_width">
+           <property name="text">
+            <string>Ширина, мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="le_base_width"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lbl_base_height">
+           <property name="text">
+            <string>Толщина, мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="le_base_height"/>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="lbl_base_sizes">
+           <property name="text">
+            <string>Размеры основания</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QFrame" name="fr_fin_sizes">
+        <property name="geometry">
+         <rect>
+          <x>510</x>
+          <y>160</y>
+          <width>221</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lbl_fin_length">
+           <property name="text">
+            <string>Длина, мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="le_fin_length"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lbl_fin_width">
+           <property name="text">
+            <string>Ширина, мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="le_fin_width"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lbl_fin_height">
+           <property name="text">
+            <string>Высота, мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="le_fin_height"/>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="lbl_fin_sizes">
+           <property name="text">
+            <string>Размеры рёбер</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QLabel" name="lbl_image">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>40</y>
+          <width>201</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>407</width>
+          <height>284</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>407</width>
+          <height>284</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

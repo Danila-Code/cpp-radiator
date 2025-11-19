@@ -21,7 +21,7 @@ double Pr(double t) {
 // size - defining size
 // t - defining temperature
 double Re(double speed, double size, double t) {
-    speed * dimension / KViscosity(t);
+    return speed * size / KViscosity(t);
 }
 
 // the Grasgoff criterion
