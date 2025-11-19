@@ -39,5 +39,5 @@ double VolExpCoeff(double t) {
 
 // thermal conductivity
 double TConductivity(double t) {
-    return Conductivity(t) / Density(t) / HeatCapacity(t);
+    return Conductivity(t) / Density(t) / HCapacity(t);
 }

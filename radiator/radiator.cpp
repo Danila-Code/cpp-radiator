@@ -14,7 +14,7 @@ double Radiator::GetRadiatorTemperature(double t_env, double thermal_power, Orie
             && thermal_power == thermal_power_.value()
             && orient == orient_.value()) {
     } else {
-        env_t_ = env_t;
+        t_env_ = t_env;
         thermal_power_ = thermal_power;
         orient_ = orient;
         CalculateTemperature();
@@ -25,7 +25,7 @@ double Radiator::GetRadiatorTemperature(double t_env, double thermal_power, Orie
 void Radiator::CalculateTemperature() {
 
 
-    float KinVisc,Lamda,g,Pr,Gr,tm,AlfaSK,AlfaFK;
+    /*float KinVisc,Lamda,g,Pr,Gr,tm,AlfaSK,AlfaFK;
     float H,B,F,L,LS,f,U,AlfaL;
     tm=0.5*(tEnv+tF);
     KinVisc=AirKinViscosity(tm);
@@ -84,5 +84,5 @@ void Radiator::CalculateTemperature() {
         P[i]=conduc[i]*(tF-tEnv);
         conduc[4]+=conduc[i];
         P[4]+=P[i];
-    }
+    }*/
 }
