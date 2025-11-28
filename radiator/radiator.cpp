@@ -2,17 +2,17 @@
 
 Radiator::Radiator(Size base_size, Size fin_size,
     double fin_step, double fin_area_width,
-    double conductivity)
+    double conductivity, double  blackness)
         : base_size_{base_size}, fin_size_{fin_size},
           fin_step_{fin_step}, fin_area_width_{fin_area_width},
-          conductivity_{conductivity} {
+          conductivity_{conductivity}, blackness_{blackness} {
 }
 
 double Radiator::GetRadiatorTemperature(double t_env, double thermal_power, Orientation orient) {
     if (temperature_.value()
             && t_env == t_env_.value()
             && thermal_power == thermal_power_.value()
-            && orient == orient_.value()) {
+            && orient == orient_) {
     } else {
         t_env_ = t_env;
         thermal_power_ = thermal_power;
@@ -85,4 +85,57 @@ void Radiator::CalculateTemperature() {
         conduc[4]+=conduc[i];
         P[4]+=P[i];
     }*/
+}
+
+// Setters
+void Radiator::SetBaseWidth(double width) {
+    base_size_.width = width;
+}
+
+void Radiator::SetBaseLength(double length) {
+    base_size_.length = length;
+}
+
+void Radiator::SetBaseThickness(double thickness) {
+    base_size_.height = thickness;
+}
+
+void Radiator::SetFinLength(double length) {
+    fin_size_.length = length;
+}
+
+void Radiator::SetFinWidth(double width) {
+    fin_size_.width = width;
+}
+
+void Radiator::SetFinHeight(double height) {
+    fin_size_.height = height;
+}
+
+void Radiator::SetFinAreaWidth(double fin_area_width) {
+    fin_area_width_ = fin_area_width;
+}
+
+void Radiator::SetFinStep(double fin_step) {
+    fin_step_ = fin_step;
+}
+
+void Radiator::SetConductivity(double conductivity) {
+    conductivity_ = conductivity;
+}
+
+void Radiator::SetBlackness(double blackness) {
+    blackness_ = blackness;
+}
+
+void Radiator::SetPower(double power) {
+    thermal_power_ = power;
+}
+
+void Radiator::SetTEnv(double t_env) {
+    t_env_ = t_env;
+}
+
+void Radiator::SetOrientation(Orientation orient) {
+    orient_ = orient;
 }
