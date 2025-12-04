@@ -26,7 +26,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         air_property.h
         similarity_criteria.h
         heat_exchange.h
-        heat_exchange.h
         heat_exchange.cpp
         radiator.h
         radiator.cpp

@@ -1,4 +1,10 @@
+#include "heat_exchange.h"
 #include "radiator.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <numeric>
 
 Radiator::Radiator(Size base_size, Size fin_size,
     double fin_step, double fin_area_width,
@@ -8,83 +14,119 @@ Radiator::Radiator(Size base_size, Size fin_size,
           conductivity_{conductivity}, blackness_{blackness} {
 }
 
-double Radiator::GetRadiatorTemperature(double t_env, double thermal_power, Orientation orient) {
-    if (temperature_.value()
-            && t_env == t_env_.value()
-            && thermal_power == thermal_power_.value()
-            && orient == orient_) {
-    } else {
-        t_env_ = t_env;
-        thermal_power_ = thermal_power;
-        orient_ = orient;
-        CalculateTemperature();
-    }
-    return temperature_.value();
-}
+Results Radiator::Calculate() {
+    const double EPSILON = 1e-3;
+    // braking coefficient
+    const double K = 0.7;
 
-void Radiator::CalculateTemperature() {
+    // squares
+    // the area of projection of the edges on the base
+    double fins_base_sq = fin_area_width_ * fin_size_.length;
+    // the surface area stretched over the radiator's fins
+    double streched_sq = 2 * (fin_area_width_ + fin_size_.length) * fin_size_.height
+                         + fins_base_sq;
+    // radiator base area
+    double base_sq = base_size_.length * base_size_.width
+                     + 2 * (base_size_.width + base_size_.length) * base_size_.height;
+    // radiator base area without fins streched area
+    double base_without_fins_sq = base_sq - fins_base_sq;
 
+    // length between two fins
+    double can_width = fin_step_ - fin_size_.width;
+    // numbers of fins
 
-    /*float KinVisc,Lamda,g,Pr,Gr,tm,AlfaSK,AlfaFK;
-    float H,B,F,L,LS,f,U,AlfaL;
-    tm=0.5*(tEnv+tF);
-    KinVisc=AirKinViscosity(tm);
-    Lamda=AirConductivity(tm);
-    Pr=AirPr(tm);
+    assert(fin_step_);
 
-    int fin_number = (fin_area_width_ - fin_size_.width) / fin_step + 1;
+    int fin_number = (fin_area_width_ - fin_size_.width) / fin_step_ + 1;
+    // defining size for base
+    double l_base;
+    // defining size for fins
+    double l_fins;
+    // orientation coefficient
+    double orient_coeff = 1;
+
+    // the transverse perimeter of fin
+    double fin_perim = 2 * fin_size_.length * fin_size_.width;
+    // cross-sectional area of fin
+    double fin_section_sq = fin_size_.length * fin_size_.width;
+    // between fins area
+    double between_fins_sq = fins_base_sq - fin_section_sq * fin_number;
+
+    assert(fin_perim);
+    // effective fins height
+    double fin_height = fin_size_.height + fin_section_sq / fin_perim;
 
     switch(orient_){
-    case 0:
-        L = base_size_.length;
-        F = 1;
-        LS = fin_size_.length;
+    case Orientation::VerticalVerticalFin: // vertical with vertical fins
+        l_base = base_size_.length;
+        l_fins = fin_size_.length;
         break;
-    case 1:
-        L = base_size_.width;
-        F = 1;
-        LS = fin_number * (2 * fin_size_.height + fin_step_)
-             - (fin_step_ - fin_size_.width);
+    case Orientation::VerticalHorizontalFin: // vertical with horizontal fins
+        l_base = base_size_.width;
+        // the length of the path enclosed by air
+        l_fins = fin_number * 2 * fin_size_.height + fin_area_width_;
         break;
-    case 2:
-        L = base_size_.length;
-        F = 1.3;
-        LS = fin_size_.length;
+    case Orientation::HorizontaUpFin: // horizontal with fins up
+        l_base = std::min(base_size_.length, base_size_.width);
+        orient_coeff = 1.3;
+        l_fins = fin_size_.length;
         break;
-    case 3:
-        L = base_size_.length;
-        F = 0.7;
-        LS = fin_size_.length;
+    case Orientation::HorizontalDownFin: // horizontal with fins down
+        l_base = std::min(base_size_.length, base_size_.width);
+        orient_coeff = 0.7;
+        l_fins = fin_size_.length;
         break;
     }
 
-    AlfaSK = F * AlfaConv(t, t_env_, LS);
+    // P = alfa * S * (tw - t_env_)
+    double cond_conv_base, cond_conv_fins, cond_rad_fins, cond_rad_base, sum_conducts;
+    double t0 = thermal_power_ / 10 / (base_without_fins_sq + streched_sq) + t_env_;
+    double t1 = t0;
+    do {
+        t0 = (t1 - t0) * K + t0;
+        // convective heat transfer coefficient for radiators base
+        double alfa_conv_base = orient_coeff * AlfaConvRad(t0, t_env_, l_base);
+        // convective conduction from radiators base
+        cond_conv_base = alfa_conv_base * base_without_fins_sq ;
 
-    if(orient_ == Orientation::VerticalHorizontalFin) {
-        AlfaSK = AlfaSK * 0.5 * (1 + 0.7);
-    }
+        // convective heat transfer coefficient for radiators fins
+        double alfa_conv_fins = orient_coeff * AlfaConv(t0, t_env_, l_fins);
 
-    AlfaFK = F * AlfaKonvRad(t, t_env_, L);
+        assert(conductivity_);
+        assert(fin_section_sq);
 
-    U = 2 * (WidthS + LengthS);
-    f = WidthS * LengthS;
-    B = std::pow(AlfaSK*U/(LamdaM*f), 0.5);
-    H = HeightS + f/U;
+        // intermediate value
+        double temp = std::pow(alfa_conv_fins * fin_perim / conductivity_ / fin_section_sq, 0.5);
 
-    conduc[2]=N*LamdaM*f*B*tanh(B*H)
-                +AlfaSK*(N-1)*LengthBetveenS*LengthS;
-    conduc[3]=AlfaFK*(WidthF*LengthF-N*WidthS*LengthS
-                          -(N-1)*LengthBetveenS*LengthS+2*(LengthF+WidthF)*HeightF);
-    AlfaL=CalcAlfaL(tF,tEnv,E);
-    conduc[0]=AlfaL*((LengthBetveenS*(N-1)+WidthS*N)*LengthS+2*((LengthBetveenS*(N-1)+WidthS*N)+LengthS)*HeightS);
-    conduc[1]=AlfaL*(WidthF*LengthF-N*WidthS*LengthS-LengthBetveenS*(N-1)*LengthS+2*(LengthF+WidthF)*HeightF);
-    conduc[4]=0;
-    P[4]=0;
-    for(int i=0;i<4;i++){
-        P[i]=conduc[i]*(tF-tEnv);
-        conduc[4]+=conduc[i];
-        P[4]+=P[i];
-    }*/
+        double cond_conv_one_fin = conductivity_ * fin_section_sq * temp * std::tanh(temp * fin_height);
+        // convective conduction from radiators fins
+        cond_conv_fins = fin_number * cond_conv_one_fin
+                                + alfa_conv_fins * between_fins_sq;
+
+        // radiant heat transfer coefficient
+        double alfa_rad = AlfaRadiant(t0, t_env_, blackness_);
+        // radiant conduction from radiator's fins
+        cond_rad_fins = alfa_rad * streched_sq;
+        // radiant conduction from radiator's base
+        cond_rad_base = alfa_rad * base_without_fins_sq;
+
+        sum_conducts = cond_conv_base + cond_conv_fins + cond_rad_base + cond_rad_fins;
+
+        assert(sum_conducts);
+
+        t1 = thermal_power_ / sum_conducts + t_env_;
+    } while (std::abs(t1 - t0) > EPSILON);
+    temperature_ = t1;
+
+    std::vector<double> conducts{cond_rad_base, cond_rad_fins,
+                                 cond_conv_base, cond_conv_fins, sum_conducts};
+    std::vector<double> powers(conducts.size());
+    std::transform(conducts.begin(), conducts.end(), powers.begin(), [this, t1](double value) {
+        return value * (t1 - t_env_);
+    });
+    return Results{t1,
+                   std::move(conducts),
+                   std::move(powers)};
 }
 
 // Setters
