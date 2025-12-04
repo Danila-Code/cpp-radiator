@@ -42,7 +42,7 @@ MainWindow::~MainWindow() {
 // Calculate radiator temperature and thermal coeffs
 void MainWindow::on_pb_calculate_clicked() {
     SetRadiatorParams();
-    //radiator_.GetRadiatorTemperature();
+    UpdateResults(radiator_.Calculate());
 }
 
 void MainWindow::on_le_base_length_textChanged(const QString &arg1) {
@@ -108,16 +108,17 @@ void MainWindow::SetValidators() {
 }
 // set params of Radiator
 void MainWindow::SetRadiatorParams() {
+    const int MM_IN_METERS = 1000;
     // base sizes
-    radiator_.SetBaseThickness(ui->le_base_height->text().toDouble());
-    radiator_.SetBaseLength(ui->le_base_length->text().toDouble());
-    radiator_.SetBaseWidth(ui->le_base_width->text().toDouble());
+    radiator_.SetBaseThickness(ui->le_base_height->text().toDouble() / MM_IN_METERS);
+    radiator_.SetBaseLength(ui->le_base_length->text().toDouble() / MM_IN_METERS);
+    radiator_.SetBaseWidth(ui->le_base_width->text().toDouble() / MM_IN_METERS);
     // fins sizes
-    radiator_.SetFinHeight(ui->le_fin_height->text().toDouble());
-    radiator_.SetFinLength(ui->le_fin_length->text().toDouble());
-    radiator_.SetFinWidth(ui->le_fin_width->text().toDouble());
-    radiator_.SetFinAreaWidth(ui->le_fin_area_width->text().toDouble());
-    radiator_.SetFinStep(ui->le_fin_step->text().toDouble());
+    radiator_.SetFinHeight(ui->le_fin_height->text().toDouble() / MM_IN_METERS);
+    radiator_.SetFinLength(ui->le_fin_length->text().toDouble() / MM_IN_METERS);
+    radiator_.SetFinWidth(ui->le_fin_width->text().toDouble() / MM_IN_METERS);
+    radiator_.SetFinAreaWidth(ui->le_fin_area_width->text().toDouble() / MM_IN_METERS);
+    radiator_.SetFinStep(ui->le_fin_step->text().toDouble() / MM_IN_METERS);
     // thermal params
     radiator_.SetConductivity(ui->led_conductivity->text().toDouble());
     radiator_.SetBlackness(ui->led_blackness->text().toDouble());
@@ -128,7 +129,24 @@ void MainWindow::SetRadiatorParams() {
 }
 // verify line edit text and undo if it invalid
 void MainWindow::Validate(QLineEdit* const le) {
-    if (!le->hasAcceptableInput()) {
+    if (!le->text().isEmpty() && !le->hasAcceptableInput()) {
         le->undo();
     }
+}
+
+void MainWindow::UpdateResults(const Results& results) {
+    QTableWidget* table = ui->tb_results;
+    int col = 0;
+    for (const auto& vec : {results.conducts, results.powers}) {
+        for (int row = 0; row < vec.size(); ++row) {
+            QTableWidgetItem* item = table->item(row, col);
+            if (!item) {
+                item = new QTableWidgetItem;
+                table->setItem(row, col, item);
+            }
+            item->setText(QString::number(vec[row]));
+        }
+        ++col;
+    }
+    ui->lbl_t_radiator->setText(QString::number(results.temperature));
 }

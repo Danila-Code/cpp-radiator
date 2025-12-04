@@ -1,9 +1,13 @@
-#ifndef RADIATOR_H
-#define RADIATOR_H
+#pragma once
+// all sizes in meters
+// temperatures in degrees Celsius
+#include <vector>
 
-#endif // RADIATOR_H
-
-#include <optional>
+struct Results {
+    double temperature;
+    std::vector<double> conducts; // last element holds sum of conducts
+    std::vector<double> powers; // last element holds sum of powers
+};
 
 enum class Orientation {
     VerticalVerticalFin,
@@ -25,7 +29,7 @@ public:
              double fin_step_, double fin_area_width_,
              double conductivity, double blackness);
 
-    double GetRadiatorTemperature(double t_env, double thermal_power, Orientation orient);
+    Results Calculate();
 
 // setters
     // base sizes
@@ -48,10 +52,6 @@ public:
     void SetOrientation(Orientation orient);
 
 private:
-    // calculate radiator temperature
-    void CalculateTemperature();
-
-
     // base sizes
     Size base_size_;
     // fin sizers
@@ -70,9 +70,9 @@ private:
     Orientation orient_;
 
     // thermal power
-    std::optional<double> thermal_power_;
+    double thermal_power_;
     // temperature of environment
-    std::optional<double> t_env_;
+    double t_env_;
     // temperature of radiator
-    std::optional<double> temperature_;
+    double temperature_;
 };

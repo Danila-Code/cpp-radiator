@@ -1,12 +1,9 @@
-#ifndef HEAT_EXCHANGE_H
-#define HEAT_EXCHANGE_H
-
-#endif // HEAT_EXCHANGE_H
+#pragma once
 
 #include "similarity_criteria.h"
 
 // the Stefan-Boltzmann constant
-const double SIGMA = 5.67e-8;
+const double SIGMA = 5.67;
 
 enum class FlowMode {
     FILM,
@@ -23,6 +20,9 @@ double AlfaRadiant(double t1, double t2, double blackness);
 // size - defining size
 // tw - temperature of wall
 // tf - temperature of fluid
-double AlfaKonv(double tw, double tf, double size);
+double AlfaConv(double tw, double tf, double size);
 
-double AlfaKonvRad(double tw,double tf,double size);
+double AlfaConvRad(double tw,double tf,double size);
+
+// P = conduc * (tw - t_env);
+double CalcP(double tw, double t_env, double conduc);

@@ -52,6 +52,7 @@ private:
     void SetValidators();
     void SetRadiatorParams();
     void Validate(QLineEdit* const le);
+    void UpdateResults(const Results& results);
 
 };
 #endif // MAINWINDOW_H
