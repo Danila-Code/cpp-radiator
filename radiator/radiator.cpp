@@ -1,5 +1,6 @@
 #include "heat_exchange.h"
 #include "radiator.h"
+#include "solver.h"
 
 #include <algorithm>
 #include <cassert>
@@ -14,11 +15,7 @@ Radiator::Radiator(Size base_size, Size fin_size,
           conductivity_{conductivity}, blackness_{blackness} {
 }
 
-Results Radiator::Calculate() {
-    const double EPSILON = 1e-3;
-    // braking coefficient
-    const double K = 0.7;
-
+void Radiator::CalculateT(Results& res0) {
     // squares
     // the area of projection of the edges on the base
     double fins_base_sq = fin_area_width_ * fin_size_.length;
@@ -80,10 +77,8 @@ Results Radiator::Calculate() {
 
     // P = alfa * S * (tw - t_env_)
     double cond_conv_base, cond_conv_fins, cond_rad_fins, cond_rad_base, sum_conducts;
-    double t0 = thermal_power_ / 10 / (base_without_fins_sq + streched_sq) + t_env_;
-    double t1 = t0;
-    do {
-        t0 = (t1 - t0) * K + t0;
+    double t0 = res0.temperature;
+
         // convective heat transfer coefficient for radiators base
         double alfa_conv_base = orient_coeff * AlfaConvRad(t0, t_env_, l_base);
         // convective conduction from radiators base
@@ -101,7 +96,7 @@ Results Radiator::Calculate() {
         double cond_conv_one_fin = conductivity_ * fin_section_sq * temp * std::tanh(temp * fin_height);
         // convective conduction from radiators fins
         cond_conv_fins = fin_number * cond_conv_one_fin
-                                + alfa_conv_fins * between_fins_sq;
+                         + alfa_conv_fins * between_fins_sq;
 
         // radiant heat transfer coefficient
         double alfa_rad = AlfaRadiant(t0, t_env_, blackness_);
@@ -114,19 +109,42 @@ Results Radiator::Calculate() {
 
         assert(sum_conducts);
 
-        t1 = thermal_power_ / sum_conducts + t_env_;
-    } while (std::abs(t1 - t0) > EPSILON);
-    temperature_ = t1;
+        res0.temperature = thermal_power_ / sum_conducts + t_env_;
 
-    std::vector<double> conducts{cond_rad_base, cond_rad_fins,
-                                 cond_conv_base, cond_conv_fins, sum_conducts};
-    std::vector<double> powers(conducts.size());
-    std::transform(conducts.begin(), conducts.end(), powers.begin(), [this, t1](double value) {
-        return value * (t1 - t_env_);
+    res0.conducts = {cond_rad_base, cond_rad_fins,
+                     cond_conv_base, cond_conv_fins, sum_conducts};
+    res0.powers = std::vector<double>(res0.conducts.size());
+
+    std::transform(res0.conducts.begin(), res0.conducts.end(), res0.powers.begin(), [this, res0](double value) {
+        return value * (res0.temperature - t_env_);
     });
-    return Results{t1,
-                   std::move(conducts),
-                   std::move(powers)};
+}
+
+Results Radiator::Calculate() {
+    Solver solver(0.7, 1e-3);
+
+    // squares
+    // the area of projection of the edges on the base
+    double fins_base_sq = fin_area_width_ * fin_size_.length;
+    // the surface area stretched over the radiator's fins
+    double streched_sq = 2 * (fin_area_width_ + fin_size_.length) * fin_size_.height
+                         + fins_base_sq;
+    // radiator base area
+    double base_sq = base_size_.length * base_size_.width
+                     + 2 * (base_size_.width + base_size_.length) * base_size_.height;
+    // radiator base area without fins streched area
+    double base_without_fins_sq = base_sq - fins_base_sq;
+
+    // P = alfa * S * (tw - t_env_)
+    double t0 = thermal_power_ / 10 / (base_without_fins_sq + streched_sq) + t_env_;
+
+    std::function<void(Results&)> calc_func = [this](Results& r) {
+        CalculateT(r);
+    };
+
+    Results res{t0};
+    solver.Solve(res, calc_func);
+    return res;
 }
 
 // Setters

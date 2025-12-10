@@ -7,7 +7,21 @@ struct Results {
     double temperature;
     std::vector<double> conducts; // last element holds sum of conducts
     std::vector<double> powers; // last element holds sum of powers
+
+    Results& operator=(double value) {
+        temperature = value;
+        return *this;
+    }
+
+    double operator-(const Results& rhs) {
+        return temperature - rhs.temperature;
+    }
+
+    double operator+(double value) {
+        return temperature + value;
+    }
 };
+
 
 enum class Orientation {
     VerticalVerticalFin,
@@ -52,6 +66,8 @@ public:
     void SetOrientation(Orientation orient);
 
 private:
+    void CalculateT(Results& res0);
+
     // base sizes
     Size base_size_;
     // fin sizers
