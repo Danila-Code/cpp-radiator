@@ -30,6 +30,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         radiator.h
         radiator.cpp
         resources.qrc
+        solver.h
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET radiator APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
